@@ -15,7 +15,7 @@ This project represents the level of hands-on infrastructure work I’ll be doin
 
 Why This Architecture Matters in the Real World
 
-Companies do not expose internal services directly to the internet — they route access through tightly secured entry points.
+Companies do not expose internal services directly to the internet. They route access through tightly secured entry points.
 
 This prevents:
 
