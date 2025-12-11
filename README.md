@@ -1,4 +1,4 @@
-🏗️ Project Overview
+Project Overview
 
 This project demonstrates a secure, production-style network pattern used by real companies:
 
@@ -13,7 +13,7 @@ Networking, routing, SSH key management, IAM-less access, service hardening, and
 
 This project represents the level of hands-on infrastructure work I’ll be doing professionally as a Cloud/DevOps Engineer.
 
-🔐 Why This Architecture Matters in the Real World
+Why This Architecture Matters in the Real World
 
 Companies do not expose internal services directly to the internet — they route access through tightly secured entry points.
 
@@ -31,7 +31,7 @@ Bot scanning & brute-force attempts
 
 A bastion → private server model is foundational to security-driven cloud deployments.
 
-🧩 Architecture Diagram
+Architecture Diagram
                 Internet
      (SSH allowed from my IP)
                      |
@@ -43,7 +43,7 @@ A bastion → private server model is foundational to security-driven cloud depl
       Private Web Server (EC2)
      Accessible only via Bastion Host
 
-⚙️ Key Technical Components
+Key Technical Components
 1. VPC + Subnets
 
 Public subnet for the bastion
@@ -83,7 +83,7 @@ sudo yum install -y httpd
 sudo systemctl enable httpd
 sudo systemctl start httpd
 
-🧪 Testing the Setup
+Testing the Setup
 From Bastion: Verify private connectivity
 ssh -i ~/.ssh/my-keypair.pem ec2-user@10.0.2.220
 
@@ -93,27 +93,27 @@ curl http://localhost
 
 Successful output returns HTML from Apache.
 
-🚀 How This Prepares Me For Cloud Engineer Roles
+How This Prepares Me For Cloud Engineer Roles
 
 This project demonstrates:
 
-✔️ Secure networking design
+Secure networking design
 
-Segmentation, routing, NACL/Security Group enforcement.
+- Segmentation, routing, NACL/Security Group enforcement.
 
-✔️ Identity-less authentication (SSH key, not IAM)
+Identity-less authentication (SSH key, not IAM)
 
-Matches production SSH security patterns.
+- Matches production SSH security patterns.
 
-✔️ Building and troubleshooting EC2 connectivity
+Building and troubleshooting EC2 connectivity
 
-Bastion → private tier is a day-1 responsibility of Cloud/DevOps Engineers.
+- Bastion to private tier is a day-1 responsibility of cloud and devops eng.
 
-✔️ Linux administration
+Linux administration
 
-File permissions, services, logs, systemctl, yum, ownership, SSH key placement.
+- File permissions, services, logs, systemctl, yum, ownership, SSH key placement.
 
-✔️ Production-style thinking
+Production-style thinking
 
 I had to reason about:
 
@@ -134,4 +134,4 @@ This is exactly the type of engineering mindset companies look for.
 I built a secure two-tier architecture where a public bastion host is used to reach a private EC2 web server.
 The private server has no public IP and can only be accessed through the bastion using SSH keys with strict file permissions.
 I configured the networking, routing, and security groups to enforce least privilege, then installed Apache on the private host and validated connectivity from inside the VPC.
-This project shows I can design secure cloud network patterns, troubleshoot connectivity, harden SSH access, and build production-style infrastructure — exactly what’s required for Cloud Engineer and DevOps roles.
+This project shows I can design secure cloud network patterns, troubleshoot connectivity, harden SSH access, and build production-style infrastructure.
