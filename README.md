@@ -1,137 +1,132 @@
-Project Overview
+# AWS Bastion Host → Private Web Tier Architecture
 
-This project demonstrates a secure, production-style network pattern used by real companies:
+## 📌 Executive Summary
+This project demonstrates a real-world, production-style AWS network pattern used by modern companies:  
+A **public bastion host** provides controlled SSH entry, while a **private EC2 web server** remains fully isolated from the public internet — following least privilege, segmentation, and zero-trust design.
 
-A public bastion host (EC2) acts as the controlled entry point.
+---
 
-A private EC2 web server hosts an application without any public exposure.
+## 🏗️ Architecture Diagram (ASCII)
 
-The entire design enforces least privilege, segmented networks, and zero-trust access paths.
+             ┌───────────────────────────────┐
+             │           Internet             │
+             └───────────────────────────────┘
+                           │
+                     (IGW - Public)
+                           │
+               ┌────────────────────┐
+               │  Public Subnet     │
+               │  Bastion EC2       │
+               │  SG: SSH allowed   │
+               └────────────────────┘
+                           │
+                     SSH Over Private IP
+                           │
+            ┌─────────────────────────────┐
+            │        Private Subnet       │
+            │    Web EC2 (no public IP)   │
+            │    SG: Allow only from SG   │
+            └─────────────────────────────┘
+                           │
+                    0.0.0.0/0 via NAT
+                           │
+                     ┌─────────┐
+                     │  NAT GW │
+                     └─────────┘
 
-I built this architecture to showcase practical cloud engineering skills:
-Networking, routing, SSH key management, IAM-less access, service hardening, and secure connectivity across tiers.
+---
 
-This project represents the level of hands-on infrastructure work I’ll be doing professionally as a Cloud/DevOps Engineer.
+## 🔐 Why This Architecture Is Used in the Real World
 
-Why This Architecture Matters in the Real World
+Companies use this pattern because:
 
-Companies do not expose internal services directly to the internet. They route access through tightly secured entry points.
+- Web servers **should never** be exposed directly to the internet.
+- SSH should only enter through a **controlled bastion host**.
+- NAT Gateway gives private servers internet access **without exposing them**.
+- It prevents:
+  - Lateral movement  
+  - External attack surface exposure  
+  - Unrestricted SSH access  
+  - Accidental public IP assignment  
 
-This prevents:
+This is one of the most common secure VPC patterns used in Fortune 500 DevOps, Cloud, and Security teams.
 
-External attack surface exposure
+---
 
-Lateral movement
+## 🧱 Infrastructure Components
 
-Unrestricted SSH access
+### **Networking**
+- 1× VPC (10.0.0.0/16)
+- 1× Public subnet (10.0.1.0/24)
+- 1× Private subnet (10.0.2.0/24)
+- 1× Internet Gateway (IGW)
+- 1× NAT Gateway (public subnet)
+- 2× Route Tables  
+  - Public RT → IGW  
+  - Private RT → NAT GW  
 
-Accidental public DNS leaks
+### **Compute**
+- Public Bastion EC2 (t2.micro)
+- Private Web EC2 (t2.micro)
+- SSH allowed *only* through bastion → private instance
 
-Bot scanning & brute-force attempts
+### **Security**
+- Bastion SG:  
+  - Allow SSH from my IP only  
+- Private EC2 SG:  
+  - Allow SSH **only** from Bastion SG  
 
-A bastion → private server model is foundational to security-driven cloud deployments.
+---
 
-Architecture Diagram
-                Internet
-     (SSH allowed from my IP)
-                     |
-        Bastion Host (Public)
-       EC2 – Amazon Linux 2023
-                     |
-         (Private VPC Routing)
-                     |
-      Private Web Server (EC2)
-     Accessible only via Bastion Host
+## 🖼️ Project Screenshots (Evidence)
 
-Key Technical Components
-1. VPC + Subnets
+All screenshots proving the architecture are inside:  
+`/screenshots`
 
-Public subnet for the bastion
+Included:
 
-Private subnet for the web server
+![VPC Subnets](screenshots/01-vpc-subnets.png)
+![Security Groups](screenshots/02-ec2-security-groups.png)
+![Public Route Table](screenshots/04-vpc-public-rt-routes.png)
+![Private Route Table](screenshots/05-private-rt-routes.png)
+![Internet Gateway](screenshots/06-internet-gateway.png)
+![NAT Gateway](screenshots/07-nat-gateway.png)
+![Elastic IP](screenshots/08-elastic-ip.png)
+![EC2 Instances](screenshots/09-ec2-instances.png)
+![Bastion Instance Details](screenshots/10-bastion-instance-details.png)
+![Private Instance Details](screenshots/11-private-instance-details.png)
 
-Route tables configured so private subnet has no IGW access
+---
 
-2. Security Groups
+## 🎯 Skills Demonstrated
 
-Bastion SG: SSH allowed only from my IP
+This project proves hands-on experience with:
 
-Private Web SG: SSH allowed only from Bastion SG, port 80 allowed internally
+- VPC design & subnet planning  
+- Secure bastion host patterns  
+- NAT vs IGW routing  
+- Security Group chaining (SG → SG rules)  
+- Private-only web tier design  
+- Route table configuration  
+- IAM-less SSH access patterns  
+- Infrastructure documentation and professional GitHub project layout  
 
-3. Bastion Host
+This is the kind of architecture companies expect Cloud/DevOps engineers to fully understand.
 
-Acts as a controlled “jump box”
+---
 
-Stores SSH key for private instance (with least privilege permissions)
+## 🚀 Next Upgrade (Future Enhancements)
 
-No application workload runs here
+If I choose to expand this project, next steps include:
 
-4. Private Web Server
+- Add ALB → private web tier  
+- Add SSM Session Manager (no SSH keys!)  
+- Automate the entire architecture with Terraform  
+- Add CloudWatch monitoring + dashboards  
+- Add an Auto Scaling Group for the private web tier  
 
-No public IP address
+---
 
-Accessible only through Bastion host
+## 🧑‍💻 Author
+Sebastian Caballero — Cloud/DevOps Engineer.
 
-Hosts Apache (httpd) web service
-
-5. User Data / Configuration
-
-Apache installed and configured via:
-
-sudo yum update -y
-sudo yum install -y httpd
-sudo systemctl enable httpd
-sudo systemctl start httpd
-
-Testing the Setup
-From Bastion: Verify private connectivity
-ssh -i ~/.ssh/my-keypair.pem ec2-user@10.0.2.220
-
-After connecting: verify the web service
-curl http://localhost
-
-
-Successful output returns HTML from Apache.
-
-How This Prepares Me For Cloud Engineer Roles
-
-This project demonstrates:
-
-Secure networking design
-
-- Segmentation, routing, NACL/Security Group enforcement.
-
-Identity-less authentication (SSH key, not IAM)
-
-- Matches production SSH security patterns.
-
-Building and troubleshooting EC2 connectivity
-
-- Bastion to private tier is a day-1 responsibility of cloud and devops eng.
-
-Linux administration
-
-- File permissions, services, logs, systemctl, yum, ownership, SSH key placement.
-
-Production-style thinking
-
-I had to reason about:
-
-Least privilege
-
-Attack surface reduction
-
-Controlled ingress
-
-Proper routing
-
-Service uptime
-
-This is exactly the type of engineering mindset companies look for.
-
-📝 Interview-Ready Explanation
-
-I built a secure two-tier architecture where a public bastion host is used to reach a private EC2 web server.
-The private server has no public IP and can only be accessed through the bastion using SSH keys with strict file permissions.
-I configured the networking, routing, and security groups to enforce least privilege, then installed Apache on the private host and validated connectivity from inside the VPC.
-This project shows I can design secure cloud network patterns, troubleshoot connectivity, harden SSH access, and build production-style infrastructure.
