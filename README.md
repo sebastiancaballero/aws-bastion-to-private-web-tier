@@ -53,6 +53,28 @@ This is one of the most common secure VPC patterns used in Fortune 500 DevOps, C
 
 ---
 
+## Architecture Decisions & Trade-offs
+
+**Bastion Host vs Direct SSH**
+- Chosen to centralize and audit SSH access
+- Prevents exposing private instances to the internet
+- Trade-off: additional instance cost and hop
+
+**NAT Gateway vs Public Internet Access**
+- Allows outbound updates without inbound exposure
+- Trade-off: NAT Gateway cost vs security benefits
+
+**Security Group Chaining**
+- Private EC2 only trusts Bastion SG, not IP ranges
+- Reduces blast radius if credentials are compromised
+
+**Why Not ALB / Auto Scaling Yet**
+- Scope intentionally limited to core VPC + security patterns
+- Designed as a foundational building block
+- Listed as future enhancements to show roadmap thinking
+
+---
+
 ## 🧱 Infrastructure Components
 
 ### **Networking**
