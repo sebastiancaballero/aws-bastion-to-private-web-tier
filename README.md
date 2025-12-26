@@ -150,5 +150,5 @@ If I choose to expand this project, next steps include:
 ---
 
 ## 🧑‍💻 Author
-Sebastian Caballero — Cloud/DevOps Engineer.
+Sebastian Caballero
 
